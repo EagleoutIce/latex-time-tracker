@@ -1,0 +1,205 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{microtype,array,hyperref,fancyvrb}
+\usepackage[main=ngerman,english]{babel}
+
+\usepackage[a4paper,left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
+
+\usepackage{time-tracker}
+
+\hypersetup{%
+    pdfborder=0 0 0,%
+    colorlinks=true,%
+    allcolors=teal!60!purple%
+}
+
+\usepackage{imakeidx}
+\makeindex[title=Befehlsübersicht,columns=2,columnsep=0.75cm]\renewcommand{\indexname}{Befehlsübersicht}
+
+\def\say#1{\glqq{#1}\grqq{}}
+
+\def\cmd#1{\texttt{\textcolor{teal}{\textbackslash#1}}}
+\def\cmdlink#1{\phantomsection\label{cmd:#1}\cmd{#1}}
+\def\cmdref#1{\hyperref[cmd:#1]{\cmd{#1}}}
+
+\def\arg#1{\textit{\textcolor{teal!90!white}{#1}}}
+\def\manArg#1{\texttt{\{\,\arg{#1}\,\}}}
+\def\optArg#1{\texttt{[\,\arg{#1}\,]}}
+
+\def\secref#1{\hyperref[#1]{\ref*{#1} \nameref*{#1}}}
+
+\long\def\imp#1{\emph{\textcolor{magenta}{#1}}}
+
+\newenvironment{command}[3][v1.0]{\leavevmode\\[-\baselineskip]\hspace*{-1.75em}\index{#2@\cmdref{#2}}\cmdlink{#2}$\,$#3\hfill{}\texttt{#1}\nopagebreak\smallskip\\*}{\bigskip\par{}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parsep}{0.35\baselineskip plus 0.15\baselineskip minus 0.05\baselineskip}
+
+
+\RecustomVerbatimEnvironment{Verbatim}{Verbatim}{%
+ frame=lines, framesep=0.45em,
+ rulecolor=\color{gray}, labelposition=topline,
+ commandchars=\|\(\)%
+}
+
+
+
+\RegisterUser{Flo}{Florian Sihler}
+
+\title{\textsf{\textcolor{magenta}{\{}\textcolor{teal}{time-tracker}\textcolor{magenta}{\}}}}
+\author{Florian Sihler}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Dieses Paket wurde dafür geschrieben, eine Zeitverwaltung in \LaTeX{} zu ermöglichen. Hierbei können die Zeiten in externen Dateien definiert und dann auf diverse Weisen verarbeitet werden. Die aktuelle Variante ist noch etwas starr in ihrer Verwendungsweise, die Flexibilität soll aber mit der Zeit ausgebaut werden.
+\end{abstract}
+
+\tableofcontents
+
+\section{Nutzermakros}
+
+\begin{command}{RegisterUser}{\manArg{Short}\manArg{Full}}
+    Legt einen neuen Nutzer an, für den die Zeit erfasst werden kann. Der Nutzer wird innerhalb der Dokumente mittels des \arg{short}-Bezeichners referenziert. \arg{Full} bezeichnet den Ausgeschriebenen Bezeichner. Der Name \arg{Full} kann wieder über \cmdref{GetFullName} erfragt werden. Verwendungsbeispiel: \texttt{\cmd{RegisterUser}\{Flo\}\{Florian Sihler\}}.
+\end{command}
+
+\begin{command}{GetFullName}{\manArg{Short}}
+    Gibt den vollen Namen zu einem mittels \cmdref{RegisterUser} definierten Benutzer aus. Beispiel: \texttt{\cmd{GetFullName}\{Flo\}} liefert (mit der Definition aus \cmdref{RegisterUser}): \say{\GetFullName{Flo}}.
+\end{command}
+
+\begin{command}{ParseFile}{\manArg{Filename}}
+    Verarbeitet eine Datei mit dem Bezeichner \arg{Filename}, wobei das Format dem \hyperref[sec:schema]{Schema} entsprechen muss. Der Befehl kann sowohl in der Präambel als auch im Hauptdokument verwendet werden. 
+    Allerdings muss er nach \cmdref{RegisterUser} in Erscheinung treten (der in der Datei definierte Benutzer \imp{muss} also bereits registriert sein).
+\end{command}
+
+\begin{command}{SetTagColor}{\manArg{Color}}
+    Setzt die Farbe, in der Tags (siehe \hyperref[sec:schema]{Schema}) gesetzt werden. Der Standard ist: {\makeatletter\emph{\ttrack@tag@color}}.
+\end{command}
+
+\begin{command}{GetData}{\manArg{Short}\manArg{Topic}}
+    Liefert alle Daten, die für den Benutzer \arg{Short} (\cmdref{RegisterUser}) zum Thema \manArg{Topic} (siehe \hyperref[sec:schema]{Schema}) hinterlegt sind.
+    Die Definitionen müssen hierbei aus bereits eingelesenen (\cmdref{ParseFile}) Dateien stammen.
+\end{command}
+
+% TODO: change if different levels for paragraph
+\begin{command}{TypesetTopic}{\manArg{Persons}\manArg{Topic}}
+    Dieser Befehl verwendet \cmdref{GetData} um für mehrere Personen zum \arg{Topic} die Daten zu setzen.
+    Die \arg{Persons} können hierbei durch Kommata separiert werden.
+    Der Befehl setzt weiter einen \emph{paragraph} für jede Person um die Arbeitszeiten voneinander zu treten.
+\end{command}
+
+\begin{command}{StoreTime}{\manArg{short}}
+    Dieser Befehl kann verwendet werden, um die Gesamtzeit einer Person (\arg{short}) zu persistieren. Dies erlaubt es, \cmdref{GetTime} frei im Dokument zu verwenden, unabhängig davon, wo \cmdref{ParseFile} ausgeführt wird.
+    
+    \imp{Der Befehl wird automatisch von \cmdref{RegisterUser} am Ende des Dokuments ausgeführt.}
+    Er ist dennoch für \say{Benutzer} zugänglich, falls andere Systeme zum Management von Personen verwendet werden und nicht \cmdref{RegisterUser} zur Erstellung des Benutzers verwendet wurde.
+    Falls dem Leser nicht bekannt ist, wie er dies vollführt, dann benötigt er den Befehl auch nicht.
+\end{command}
+
+\begin{command}{GetTime}{\manArg{Short}}
+    Liefert die gesamte Anwesenheit einer Person in Minuten.
+\end{command}
+
+\begin{command}{MinutesToHours}{\manArg{Short}}
+    Konvertiert Minuten in Stunden und gibt diese aus. Die verbleibenden Minuten werden hierbei abgeschnitten! Empfiehlt sich in Kombination mit \cmdref{GetTime}.
+\end{command}
+
+\section{Paketoptionen}
+\label{sec:packetoptions}Das Paket kann mit den Optionen \texttt{packages}/\texttt{nopackages} geladen werden (erstere Option ist der Standard). Sie kontrolliert, ob das Paket automatisch die benötigten Pakete lädt (\emph{pgfmath,pgffor,xcolor,enumitem}). 
+
+Mit der Option \texttt{tikz}/\texttt{notikz} kann kontrolliert werden, wie die \emph{tags} gesetzt werden. Wird \texttt{tikz} aktiviert, so muss das gleichnamige Paket explizit geladen werden.
+Dafür werden die Tags auch mit Ti\textit{k}Z dargestellt. Der Befehl \cmdref{SetTagColor} hat in beiden Fällen Effekt.
+
+\section{Versionierung}
+\subsection{Version 1.0}
+Grundlegende Kommandos hinzugefügt. Darunter: \cmdref{RegisterUser}, \cmdref{ParseFile}, \cmdref{TypesetTopic} und \cmdref{GetTime}.
+
+\section{Das Schema}
+\label{sec:schema}
+(Zeilen-)Kommentare werden, analog zu \LaTeX{} mittels einem Prozentzeichen eingeleitet. Allgemein werden
+anführende Leerfelder einer Zeile sowie leere Zeilen allgemein ignoriert, was zur Übersicht verwendet werden kann.
+\begin{description}
+    \item[Register] Eine Zeile die mit einem Doppelpunkt beginnt, setzt ein an die Datei gebundenes Register. Die allgemeine Syntax lautet hierbei:
+\begin{Verbatim}[]
+:/<Register> <Wert>;
+\end{Verbatim}
+          Wobei (bisher) die folgenden Register von Bedeutung sind:
+          \begin{description}[font=\mdseries\ttfamily]
+              \item[user] setzt das Teammitglied wobei der vereinbarte Bezeichner zu verwenden ist. Beispiel:
+\begin{Verbatim}
+:/(|color(magenta)user) Flo;
+\end{Verbatim}
+                    Dieser Bezeichner muss (zu Beginn) des Dokuments gesetzt werden.
+              \item[team] setzt den Team Namen, wobei das Register bisher noch nicht optisch gesetzt wird. Beispiel:
+\begin{Verbatim}
+:/(|color(magenta)team) Team020;
+\end{Verbatim}
+              \item[topic] setzt den Kontext für die folgenden Arbeit und kann so verwendet werden um zu spezifizieren wofür die Arbeit getätigt wurde. Diese Bezeichner \emph{müssen} über die Personen hinweg identisch sein, wenn es sich um die gleiche Arbeit handelt und sollten deswegen abgeglichen werden. Für die Meilensteine ist die Notation \say{Meilenstein X} vorgesehen, wobei das \texttt{X} die Nummer des Meilensteins repräsentiert. Dieses Register kann und sollte mehrfach in einer Definitionsdatei geändert werden. Beispiel:
+\begin{Verbatim}
+:/(|color(magenta)topic) Meilenstein 1;
+\end{Verbatim}
+              \item[tags] setzt eine Kommaseparierte Liste an Tags, sollte bisher noch nicht verwendet werden (ist bezüglich einer optisch ansprechenden Gestaltung noch in Arbeit).
+          \end{description}
+    \item[Arbeitszeiten] Hierbei handelt es sich um die wichtigsten Einträge, die notieren wann was gemacht wurde\footnote{Hinweis: Die hierbei investierte Arbeitszeit wird automatisch berechnet und bisher als totale ausgegeben. An einer Statistik 'pro Thema' wird noch gearbeitet/ihre Sinnhaftigkeit wird evaluiert.}. Es gilt die folgende, grundlegende Syntax, die auf den ersten Blick komplex erscheint, sich allerdings als durchaus sinnvoll entpuppen sollte\footnote{Wichtig! Ein Arbeitszeiteintrag darf keinen Zeilenumbruch enthalten.\LaTeX-Befehle können normal verwendet werden.}.\par{} Die allgemeine Syntax lautet:
+\begin{Verbatim}
+<YYYY>-<MM>-<DD> von <HH>:<mm> bis <HH>:<mm>: <Beschreibung>
+\end{Verbatim}
+          Diese Einträge werden durch das \texttt{topic}-Register gruppiert und sollten innerhalb eines solchen \texttt{topic}-Eintrags bereits chronologisch sortiert sein (also zeitlich sortiert, was sich aber sowieso intuitiv ergeben sollte).
+\end{description}
+
+Ein Gesamtbeispiel für eine Datei:
+\begin{Verbatim}[label=\fbox{\color{black}example.def}]
+:/(|color(magenta)user) Flo;
+:/(|color(magenta)team) Team020;
+
+
+:/(|color(magenta)topic) Meilenstein 1;
+:/(|color(magenta)tags) LaTeX;
+2019-12-16 von 21:30 bis 22:45: <obligatorische Kurzbeschreibung>
+
+2019-12-16 von 22:40 bis 22:45: Ich habe mit Höhnern getanzt, \LaTeX{} gemacht, geweint, \ldots
+:/(|color(magenta)tags) ;
+
+
+:/(|color(magenta)topic) Meilenstein 2;
+% Auch das geht, zumindest wenn die Gesamt-Block Arbeitszeit unter 24h bleibt.
+% Sonst bitte einfach auf mehrere Blöcke aufspalten.
+2019-12-24 von 22:40 bis 4:05: Die \emph{GANZE NACHT} durchgearbeitet!!
+\end{Verbatim}
+
+Im Folgenden wird die Datei mit \cmdref{ParseFile} eingelesen und durch \cmdref{TypesetTopic} gesetzt\ldots
+
+\section{Beispiel}
+Der Gesamtaufwand von \GetFullName{Flo} beträgt:
+\MinutesToHours{\GetTime{Flo}}h (\GetTime{Flo} Minuten).
+
+\ParseFile{example.def}
+\subsection{Meilenstein 1}
+\TypesetTopic{Flo}{Meilenstein 1}
+\subsection{Meilenstein 2}
+\TypesetTopic{Flo}{Meilenstein 2}
+
+Dieses Beispiel wurde erzeugt durch den folgenden Code:
+\begin{Verbatim}
+\section{Beispiel}
+Der Gesamtaufwand von \GetFullName{Flo} beträgt:
+\MinutesToHours{\GetTime{Flo}}h (\GetTime{Flo} Minuten).
+
+\ParseFile{example.def}
+\subsection{Meilenstein 1}
+\TypesetTopic{Flo}{Meilenstein 1}
+\subsection{Meilenstein 2}
+\TypesetTopic{Flo}{Meilenstein 2}
+\end{Verbatim}
+
+\clearpage\appendix
+\addcontentsline{toc}{section}{\indexname}
+\printindex
+
+\end{document}

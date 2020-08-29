@@ -1,0 +1,16 @@
+:/user Flo;
+:/team Team020;
+
+
+:/topic Meilenstein 1;
+:/tags LaTeX;
+2019-12-16 von 21:30 bis 22:45: <obligatorische Kurzbeschreibung>
+
+2019-12-16 von 22:40 bis 22:45: Ich habe mit Höhnern getanzt, \LaTeX{} gemacht, geweint, \ldots
+:/tags ;
+
+
+:/topic Meilenstein 2;
+% Auch das geht, zumindest wenn die Gesamt-Block Arbeitszeit unter 24h bleibt.
+% Sonst bitte einfach auf mehrere Blöcke aufspalten.
+2019-12-24 von 22:40 bis 4:05: Die \emph{GANZE NACHT} durchgearbeitet!
