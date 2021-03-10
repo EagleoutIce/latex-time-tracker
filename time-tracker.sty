@@ -2,10 +2,9 @@
 %% -----------------------------------------------------------------------------
 %% Version: 1.0
 %% Author:  Florian Sihler, 29.08.2020
-%% 
+%%
 %% This is a simple package which allows the definition of work times
 %% in separate documents while collecting and adding the times.
-%%
 
 %% All internal commands will be previxed by 'ttrack@'
 
@@ -20,10 +19,10 @@
 \DeclareOption{nopackages}{\ttrack@setup@packages@false}
 
 \newif\ifttrack@use@tikz@
-\DeclareOption{tikz}{\ttrack@setup@use@tikz@}
-\DeclareOption{notikz}{\ttrack@setup@use@tikz@}
+\DeclareOption{tikz}{\ttrack@use@tikz@true}
+\DeclareOption{notikz}{\ttrack@use@tikz@false}
 
-\ProcessOptions*%
+\ProcessOptions*
 
 %% Packages
 %% -----------------------------------------------------------------------------
@@ -51,24 +50,24 @@
 \newcommand*\ParseFile[1]{%
     % init:
     \def\ttrack@cl{}%
-    \immediate\openin\ttrack@file=#1\relax%
+    \immediate\openin\ttrack@file=#1\relax
     \ifeof\ttrack@file\else% exists
     \typeout{Parsing file '#1'}%
-\loop%
-    \read\ttrack@file to \ttrack@cl \relax%
-    \unless\ifeof\ttrack@file%
+\loop
+    \read\ttrack@file to \ttrack@cl \relax
+    \unless\ifeof\ttrack@file
     \stepcounter{ttrack@file@linec}%
     % \typeout{In Line: \thettrack@file@linec (\ttrack@cl)}%
     \ignorespaces\ttrack@parse@line{\ttrack@cl}% ~\\
-\repeat%
-    \fi%
+\repeat
+    \fi
     \immediate\closein\ttrack@file% always close afterwards :D
 }
 
 \def\ttrack@parse@line#1{%
-    \expandafter\ifx\expandafter\\#1\\\else% only if line is not empty:
+    \expandafter\ifx\expandafter!#1!\else% only if line is not empty:
         \expandafter\ifx#1\par\else% only if line is no paragraph
-        \expandafter\ttrack@parse@@line#1\@nil%
+        \expandafter\ttrack@parse@@line#1\@nil
     \fi\fi
 }
 
@@ -79,8 +78,8 @@
 \def\ttrack@parse@@line#1#2\@nil{%
     \def\tmp@a{#1}%
     \ifx\ttrack@cmdinit@char\tmp@a \relax% is command
-        \ttrack@parse@@line@command#2\@nil%
-    \else\ttrack@parse@@line@event#1#2\@nil%
+        \ttrack@parse@@line@command#2\@nil
+    \else\ttrack@parse@@line@event#1#2\@nil
     \fi}
 
 % Parse the command to set the current Macors appropriatly :D
@@ -104,14 +103,14 @@
 
 % Note, that we will store/append the data in registers of the format:
 % \user@topic; there will be no topic based ordering of events
-% an event will be written 
+% an event will be written
 
 
 % Else We Parse and Expect a Valid Date Structure
 \def\ttrack@month@to@name#1{%
     \ifcase#1\or{Jan}\or{Feb}\or{M\"{a}r}\or{Apr}\or{Mai}\or{Jun}%
     \or{Jul}\or{Aug}\or{Sep}\or{Okt}\or{Nov}\or{Dez}%
-    \else\@ctrerr\fi%
+    \else\@ctrerr\fi
 }
 
 
@@ -122,11 +121,11 @@
         00%
     \else \ifnum\value{ttrack@zero@gobbler}<10 \relax
         0\arabic{ttrack@zero@gobbler}%
-    \else\arabic{ttrack@zero@gobbler}\fi\fi%
+    \else\arabic{ttrack@zero@gobbler}\fi\fi
 }
 
 \def\ttrack@@date@convert#1-#2-#3\@nil{%
-    \bgroup\parbox{3ex}{\hfill\ttrack@pad@zero{#3}}.\space{\ttrack@month@to@name{#2}}.\space{}\parbox{5ex}{#1}\egroup%
+    \begingroup\parbox{3ex}{\hfill\ttrack@pad@zero{#3}}.\space{\ttrack@month@to@name{#2}}.\space{}\parbox{5ex}{#1}\endgroup
 }
 
 \def\ttrack@set@time#1#2{%
@@ -134,7 +133,7 @@
 }
 
 \def\ttrack@date@convert#1%
-{\expandafter\ifx\expandafter\\#1\\\else\expandafter\ttrack@@date@convert#1\@nil\fi}
+{\expandafter\ifx\expandafter!#1!\else\expandafter\ttrack@@date@convert#1\@nil\fi}
 
 \def\ttrack@parse@@line@event#1-#2-#3 von #4:#5 bis #6:#7: #8\@nil{%
     \@ifundefined{\ttrack@register@user @\ttrack@register@topic}{%
@@ -147,12 +146,12 @@
     \stepcounter{\ttrack@register@user @\ttrack@register@topic @count}%
     \expandafter\xdef\csname\ttrack@register@user @\ttrack@register@topic @\@nameuse{the\ttrack@register@user @\ttrack@register@topic @count}\endcsname%
     {%
-        \noexpand%
-        \item[\noexpand%
+        \noexpand
+        \item[\noexpand
             \parbox{13.25em}{%
                 \noexpand\ttrack@date@convert{#1-#2-#3},\noexpand\hfill\noexpand\ttrack@set@time{#4}{#5}\space-\space\noexpand\ttrack@set@time{#6}{#7}%
-            }\noexpand\,:] %
-        \noexpand%
+            }\noexpand\thinspace:] %
+        \noexpand
         \ttrack@output@tagsplit{%
             \@nameuse{\ttrack@register@user @\ttrack@register@topic @\@nameuse{the\ttrack@register@user @\ttrack@register@topic @count}@tags}%
         }%
@@ -187,7 +186,7 @@
         \settowidth{\ttrack@currentw}{\tag}%
         \ifdim\ttrack@currentw<1pt \else% only place if necessary
             \tikz[baseline=0.3ex]{\fill[\ttrack@tag@color,rounded corners=2.5pt] (0,0) rectangle ++(\ttrack@currentw+3.75pt,10pt) node[midway,centered] {\textcolor{white}{\scriptsize\sffamily\tag}};}\(\;\)%
-        \fi%
+        \fi
     }%
 }
 \else
@@ -196,7 +195,7 @@
         \settowidth{\ttrack@currentw}{\tag}%
         \ifdim\ttrack@currentw<1pt \else% only place if necessary
             \textcolor{\ttrack@tag@color}{\small\itshape\sffamily\tag}\(\;\)%
-        \fi%
+        \fi
     }%
 }
 \fi
@@ -209,7 +208,7 @@
         \@nameuse{#1@#2@\i}%
     }%
     \end{description}%
-    \fi%
+    \fi
 }
 
 % #1 Persons, #2 Topic
@@ -223,7 +222,7 @@
     }
 }
 
-% #1 short 
+% #1 short
 \newcommand*\StoreTime[1]{
     \edef\@time{\arabic{ttrack@users@#1@attendance@time}}
     \immediate\write\@auxout{\noexpand\expandafter\noexpand\gdef\noexpand\csname the#1attendance\noexpand\endcsname{\@time}}
@@ -231,15 +230,14 @@
 
 % #1 short
 \newcommand*\GetTime[1]{%
-    \@ifundefined{the#1attendance}{0}{%
-        \@nameuse{the#1attendance}}%
+    \@ifundefined{the#1attendance}{0}{\@nameuse{the#1attendance}}%
 }
 
 \newcounter{ttrack@calc@tmp@a}
 \newcommand*\MinutesToHours[1]{%
     \setcounter{ttrack@calc@tmp@a}{\numexpr#1/60\relax}%
     \pgfmathsetmacro\hourattendance{int(floor(\thettrack@calc@tmp@a))}%
-    \hourattendance%
+    \hourattendance
 }
 
 \endinput
