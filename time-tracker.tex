@@ -33,7 +33,7 @@
 
 \long\def\imp#1{\emph{\textcolor{magenta}{#1}}}
 
-\newenvironment{command}[3][v1.0]{\leavevmode\\[-\baselineskip]\hspace*{-1.75em}\index{#2@\cmdref{#2}}\cmdlink{#2}$\,$#3\hfill{}\texttt{#1}\nopagebreak\smallskip\\*}{\bigskip\par{}}
+\newenvironment{command}[3][v1.0]{\leavevmode\\[-\baselineskip]\hspace*{-1.75em}\index{#2?\cmdref{#2}}\cmdlink{#2}$\,$#3\hfill{}\texttt{#1}\nopagebreak\smallskip\\*}{\bigskip\par{}}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.35\baselineskip plus 0.15\baselineskip minus 0.05\baselineskip}
@@ -74,7 +74,7 @@
 \end{command}
 
 \begin{command}{ParseFile}{\manArg{Filename}}
-    Verarbeitet eine Datei mit dem Bezeichner \arg{Filename}, wobei das Format dem \hyperref[sec:schema]{Schema} entsprechen muss. Der Befehl kann sowohl in der Präambel als auch im Hauptdokument verwendet werden. 
+    Verarbeitet eine Datei mit dem Bezeichner \arg{Filename}, wobei das Format dem \hyperref[sec:schema]{Schema} entsprechen muss. Der Befehl kann sowohl in der Präambel als auch im Hauptdokument verwendet werden.
     Allerdings muss er nach \cmdref{RegisterUser} in Erscheinung treten (der in der Datei definierte Benutzer \imp{muss} also bereits registriert sein).
 \end{command}
 
@@ -96,7 +96,7 @@
 
 \begin{command}{StoreTime}{\manArg{short}}
     Dieser Befehl kann verwendet werden, um die Gesamtzeit einer Person (\arg{short}) zu persistieren. Dies erlaubt es, \cmdref{GetTime} frei im Dokument zu verwenden, unabhängig davon, wo \cmdref{ParseFile} ausgeführt wird.
-    
+
     \imp{Der Befehl wird automatisch von \cmdref{RegisterUser} am Ende des Dokuments ausgeführt.}
     Er ist dennoch für \say{Benutzer} zugänglich, falls andere Systeme zum Management von Personen verwendet werden und nicht \cmdref{RegisterUser} zur Erstellung des Benutzers verwendet wurde.
     Falls dem Leser nicht bekannt ist, wie er dies vollführt, dann benötigt er den Befehl auch nicht.
@@ -111,7 +111,7 @@
 \end{command}
 
 \section{Paketoptionen}
-\label{sec:packetoptions}Das Paket kann mit den Optionen \texttt{packages}/\texttt{nopackages} geladen werden (erstere Option ist der Standard). Sie kontrolliert, ob das Paket automatisch die benötigten Pakete lädt (\emph{pgfmath,pgffor,xcolor,enumitem}). 
+\label{sec:packetoptions}Das Paket kann mit den Optionen \texttt{packages}/\texttt{nopackages} geladen werden (erstere Option ist der Standard). Sie kontrolliert, ob das Paket automatisch die benötigten Pakete lädt (\emph{pgfmath,pgffor,xcolor,enumitem}).
 
 Mit der Option \texttt{tikz}/\texttt{notikz} kann kontrolliert werden, wie die \emph{tags} gesetzt werden. Wird \texttt{tikz} aktiviert, so muss das gleichnamige Paket explizit geladen werden.
 Dafür werden die Tags auch mit Ti\textit{k}Z dargestellt. Der Befehl \cmdref{SetTagColor} hat in beiden Fällen Effekt.
@@ -168,8 +168,8 @@ Ein Gesamtbeispiel für eine Datei:
 
 
 :/(|color(magenta)topic) Meilenstein 2;
-% Auch das geht, zumindest wenn die Gesamt-Block Arbeitszeit unter 24h bleibt.
-% Sonst bitte einfach auf mehrere Blöcke aufspalten.
+(|color(gray)% Auch das geht, zumindest wenn die Gesamt-Block Arbeitszeit unter 24h bleibt.)
+(|color(gray)% Sonst bitte einfach auf mehrere Blöcke aufspalten.)
 2019-12-24 von 22:40 bis 4:05: Die \emph{GANZE NACHT} durchgearbeitet!!
 \end{Verbatim}
 
@@ -186,7 +186,7 @@ Der Gesamtaufwand von \GetFullName{Flo} beträgt:
 \TypesetTopic{Flo}{Meilenstein 2}
 
 Dieses Beispiel wurde erzeugt durch den folgenden Code:
-\begin{Verbatim}
+\begin{Verbatim}[commandchars=\&\$\$]
 \section{Beispiel}
 Der Gesamtaufwand von \GetFullName{Flo} beträgt:
 \MinutesToHours{\GetTime{Flo}}h (\GetTime{Flo} Minuten).
