@@ -3,4 +3,4 @@
 # time-tracker
 A simple latex-package to parse time data and represent it in LaTeX.
 
-The pdf may be found [here](https://media.githubusercontent.com/media/EagleoutIce/time-tracker/gh-pages/time-tracker.pdf) and [here](https://github.com/EagleoutIce/time-tracker/blob/gh-pages/time-tracker.pdf).
+The pdf may be found [here](https://media.githubusercontent.com/media/EagleoutIce/latex-time-tracker/gh-pages/time-tracker.pdf) and [here](https://github.com/EagleoutIce/latex-time-tracker/blob/gh-pages/time-tracker.pdf).
